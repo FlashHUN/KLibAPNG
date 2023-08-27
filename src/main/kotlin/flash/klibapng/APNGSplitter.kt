@@ -27,6 +27,32 @@ object APNGSplitter {
         (fcTL.delayNum.toDouble() / fcTL.delayDen.toDouble() * 1000).toInt()
     })
 
+    fun splitWithFrameInfo(apng: APNG, addDefaultImage: Boolean = false) : List<Pair<ByteArray, FrameInfo>> {
+        val out = arrayListOf<Pair<ByteArray, FrameInfo>>()
+        if (!apng.defaultImageIsAnimated && addDefaultImage) {
+            out += apng.defaultImage.toBytes() to FrameInfo(apng.defaultImage.fcTLChunk!!)
+        }
+        out.addAll(apng.frames().map { f -> f.toBytes() to FrameInfo(f.fcTLChunk!!) })
+        return out
+    }
+
+    fun splitWithFrameInfoAndDelayMs(apng: APNG, addDefaultImage: Boolean = false) : List<Triple<ByteArray, Int, FrameInfo>> {
+        val out = arrayListOf<Triple<ByteArray, Int, FrameInfo>>()
+        if (!apng.defaultImageIsAnimated && addDefaultImage) {
+            out += Triple(
+                apng.defaultImage.toBytes(),
+                (apng.defaultImage.fcTLChunk!!.delayNum.toDouble() / apng.defaultImage.fcTLChunk!!.delayDen.toDouble() * 1000).toInt(),
+                FrameInfo(apng.defaultImage.fcTLChunk!!)
+            )
+        }
+        out.addAll(apng.frames().map { f -> Triple(
+            f.toBytes(),
+            (f.fcTLChunk!!.delayNum.toDouble() / f.fcTLChunk!!.delayDen.toDouble() * 1000).toInt(),
+            FrameInfo(f.fcTLChunk!!)
+        ) })
+        return out
+    }
+
     fun splitWithOpsApplied(apng: APNG, addDefaultImage: Boolean = false) : List<ByteArray> {
         val out = arrayListOf<ByteArray>()
         if (!apng.defaultImageIsAnimated && addDefaultImage) {

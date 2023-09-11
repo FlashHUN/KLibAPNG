@@ -5,8 +5,12 @@ import java.nio.file.StandardOpenOption
 import kotlin.io.path.Path
 
 fun main(args: Array<String>) {
-    val file = "${System.getProperty("user.dir")}/firefox.png"
-    val output = { i: Int -> "${System.getProperty("user.dir")}/firefox_$i.png"}
+    read("firefox")
+}
+
+private fun read(filename: String) {
+    val file = "${System.getProperty("user.dir")}/${filename}.png"
+    val output = { i: Int -> "${System.getProperty("user.dir")}/${filename}_$i.png"}
     val apng = APNG(file)
 
     val split = APNGSplitter.splitWithOpsAppliedAndDelaysInMs(apng)

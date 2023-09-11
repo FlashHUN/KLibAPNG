@@ -24,8 +24,19 @@ class Frame {
         val stream = ByteArrayOutputStream()
         stream.writeBytes(SIGNATURE)
         stream.writeBytes(ihdrChunk.raw)
-        otherChunks.forEach { o -> stream.writeBytes(o.raw) }
-        idatChunks.forEach { i -> stream.writeBytes(i.raw) }
+        otherChunks.forEach { o ->
+            if (o.chunkType == "tRNS") { // Gray+Alpha and RGBS images may not have a tRNS chunk, check com.sun.imageio.plugins.png.PNGImageReader#parse_tRNS_chunk
+                val validColorTypes = arrayOf(0, 2, 3)
+                if (validColorTypes.contains(ihdrChunk.colorType.toInt())) {
+                    stream.writeBytes(o.raw)
+                }
+            } else {
+                stream.writeBytes(o.raw)
+            }
+        }
+        idatChunks.forEach { i ->
+            stream.writeBytes(i.raw)
+        }
         stream.writeBytes(iendChunk!!.raw)
 
         return stream.toByteArray()

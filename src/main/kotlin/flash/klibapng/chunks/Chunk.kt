@@ -58,4 +58,9 @@ open class Chunk internal constructor() {
     }
 
     protected open fun parseData(stream: ByteArrayInputStream) {}
+
+    @OptIn(ExperimentalUnsignedTypes::class)
+    override fun toString(): String {
+        return "$chunkType ($length - $crc): [${chunkData!!.toUByteArray().joinToString(", ")}]"
+    }
 }
